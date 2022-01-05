@@ -12,6 +12,7 @@ const getAllProduct = async () => {
         throw err;
     }finally{
         client.release();    
+        
     }
     return result
 }
