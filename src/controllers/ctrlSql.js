@@ -1,54 +1,81 @@
 const pool = require('../models/cnxSql')
 
 const getAllProduct = async () => {
-    let client,result;
-    try{
+    let client, result;
+    try {
         client = await pool.connect(); // Espera a abrir conexion
-        const data = await client.query(`select * from products;`)
+        const data = await client.query(`select p.*,f.*
+        from products as P 
+        join fabricante as F 
+        on
+        P.CODE_FAB=F.id_FAb;`)
         result = data.rows
         console.log(result)
-    }catch(err){
+    } catch (err) {
         console.log(err);
         throw err;
-    }finally{
-        client.release();    
-        
+    } finally {
+        client.release();
+
     }
     return result
 }
 
-
 const getProductByFab = async (id) => {
-    let client,result;
-    try{
+    let client, result;
+    try {
         client = await pool.connect(); // Espera a abrir conexion
-        const data = await client.query(`select  *
+        const data = await client.query(`select p.*,f.*
                                                 from products as P 
                                                 join fabricante as F 
                                                 on
                                                 P.CODE_FAB=F.id_FAb
                                                 where CODE_FAB= $1 
                                                 order by 1;`
-                                                ,[id])
+            , [id])
         result = data.rows
         console.log(result)
-    }catch(err){
+    } catch (err) {
         console.log(err);
         throw err;
-    }finally{
-        client.release();    
+    } finally {
+        client.release();
     }
     return result
 }
 
 
-const getProductByType = async (a,b) => {
-
-  
-    
-    try{
+const getProductByName = async (name) => {
+    let client, result;
+    try {
         client = await pool.connect(); // Espera a abrir conexion
-        const data = await client.query(`select  *
+        const data = await client.query(`select  p.*,f.*
+                                                from products as P 
+                                                join fabricante as F 
+                                                on
+                                                P.CODE_FAB=F.id_FAb
+                                                where nombre ilike $1
+                                                order by 1;`
+            , [`%${name}%`])
+        result = data.rows
+        console.log(result)
+    } catch (err) {
+        console.log(err);
+        throw err;
+    } finally {
+        client.release();
+    }
+    return result
+}
+
+
+
+const getProductByType = async (a, b) => {
+
+
+    try {
+        client = await pool.connect(); // Espera a abrir conexion
+        const data = await client.query(`select p.*,f.*
                                                 from products as P 
                                                 join fabricante as F 
                                                 on
@@ -56,31 +83,32 @@ const getProductByType = async (a,b) => {
                                                 where CODE_FAB = $1 
                                                 and categoria = $2
                                                 order by 1;`
-                                                ,[a,b])
-                                                console.log(a,b)
-                                              
-                                                
+            , [a, b])
+        console.log(a, b)
+
+
         result = data.rows
-      console.log(result)
-    }catch(err){
+        console.log(result)
+    } catch (err) {
         console.log(err);
         throw err;
-    }finally{
-        client.release();    
+    } finally {
+        client.release();
     }
     return result
 }
 
 //getAllProduct ()
 
-//getProductByFab(2)
+//getProductByName('nike')
 
 //getProductByType(1,'run')
 
 const getproduct = {
     getAllProduct,
     getProductByFab,
-    getProductByType
+    getProductByType,
+    getProductByName
 
 }
 
